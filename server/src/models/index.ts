@@ -1,1 +1,8 @@
-// HINT: Define TypeScript types/interfaces for normalized results here
+export interface SearchResult {
+	id: string | number;
+	title: string;
+	overview?: string;
+	poster?: string | null;
+	provider: string;
+	type?: string;
+}

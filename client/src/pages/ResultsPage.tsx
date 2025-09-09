@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ResultList from '../components/ResultList';
-import axios from 'axios';
+import { searchTitles, SearchResult } from '../api';
 
 const ResultsPage: React.FC = () => {
   const location = useLocation();
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,15 +20,11 @@ const ResultsPage: React.FC = () => {
     setLoading(true);
     setError(null);
     setResults([]);
-    axios.post('/api/search', { query, country, provider })
-      .then(res => {
-        if (res.data && Array.isArray(res.data.results)) {
-          setResults(res.data.results);
-          if (res.data.results.length === 0) {
-            setError('Keine Ergebnisse gefunden.');
-          }
-        } else {
-          setError('Unerwartete Antwort vom Server.');
+    searchTitles({ query, country, provider })
+      .then(results => {
+        setResults(results);
+        if (results.length === 0) {
+          setError('Keine Ergebnisse gefunden.');
         }
       })
       .catch(err => {
@@ -36,6 +32,8 @@ const ResultsPage: React.FC = () => {
           setError(`API-Fehler: ${err.response.data.error}`);
         } else if (err.message && err.message.includes('Network')) {
           setError('Netzwerkfehler: Bitte Verbindung prüfen.');
+        } else if (err.message) {
+          setError(err.message);
         } else {
           setError('Unbekannter Fehler bei der Suche.');
         }

@@ -1,12 +1,13 @@
 
 import axios from 'axios';
+import { SearchResult } from '../models';
 
-export const searchTMDb = async (query: string, country: string) => {
+export const searchTMDb = async (query: string, country: string): Promise<SearchResult[]> => {
   const apiKey = process.env.TMDB_API_KEY;
   const url = `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${encodeURIComponent(query)}&region=${country}`;
   const response = await axios.get(url);
   // Normalisiere das Ergebnis auf ein einheitliches Format
-  return response.data.results.map((item: any) => ({
+  return response.data.results.map((item: any): SearchResult => ({
     id: item.id,
     title: item.title || item.name,
     overview: item.overview,
@@ -16,12 +17,12 @@ export const searchTMDb = async (query: string, country: string) => {
   }));
 };
 
-export const searchJustWatch = async (query: string, country: string) => {
+export const searchJustWatch = async (query: string, country: string): Promise<SearchResult[]> => {
   // JustWatch hat keine offizielle öffentliche API, daher verwenden wir einen inoffiziellen Endpunkt
   const url = `https://apis.justwatch.com/content/titles/${country}/popular?body=${encodeURIComponent(JSON.stringify({query}))}`;
   const response = await axios.get(url);
   // Normalisiere das Ergebnis
-  return (response.data.items || []).map((item: any) => ({
+  return (response.data.items || []).map((item: any): SearchResult => ({
     id: item.id,
     title: item.title,
     overview: item.short_description,
@@ -31,7 +32,7 @@ export const searchJustWatch = async (query: string, country: string) => {
   }));
 };
 
-export const searchUtelly = async (query: string, country: string) => {
+export const searchUtelly = async (query: string, country: string): Promise<SearchResult[]> => {
   const apiKey = process.env.UTELLY_API_KEY;
   const url = `https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com/lookup?term=${encodeURIComponent(query)}&country=${country}`;
   const response = await axios.get(url, {
@@ -41,7 +42,7 @@ export const searchUtelly = async (query: string, country: string) => {
     },
   });
   // Normalisiere das Ergebnis
-  return (response.data.results || []).map((item: any) => ({
+  return (response.data.results || []).map((item: any): SearchResult => ({
     id: item.id,
     title: item.name,
     overview: '',

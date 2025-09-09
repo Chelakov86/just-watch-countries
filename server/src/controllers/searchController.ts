@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { searchTMDb, searchJustWatch, searchUtelly } from '../services/searchServices';
+import { SearchResult } from '../models';
 
 export const searchController = async (req: Request, res: Response) => {
   const { query, country, provider } = req.body;
@@ -16,7 +17,7 @@ export const searchController = async (req: Request, res: Response) => {
   }
 
   try {
-    let results = [];
+    let results: SearchResult[] = [];
     switch (provider) {
       case 'TMDb':
         results = await searchTMDb(query, country);
