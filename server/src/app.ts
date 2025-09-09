@@ -2,7 +2,7 @@
 // HINT: Set up Express, routes, and middleware here
 import express from 'express';
 import dotenv from 'dotenv';
-import searchRoutes from './routes/searchRoutes';
+const searchRoutes = require('./routes/searchRoutes').default;
 
 dotenv.config();
 
