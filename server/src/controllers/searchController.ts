@@ -3,6 +3,18 @@ import { searchTMDb, searchJustWatch, searchUtelly } from '../services/searchSer
 
 export const searchController = async (req: Request, res: Response) => {
   const { query, country, provider } = req.body;
+
+  // Eingabevalidierung
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    return res.status(400).json({ error: 'Suchbegriff (query) ist erforderlich.' });
+  }
+  if (!country || typeof country !== 'string' || country.length !== 2) {
+    return res.status(400).json({ error: 'Ländercode (country) muss genau 2 Buchstaben haben.' });
+  }
+  if (!provider || !['TMDb', 'JustWatch', 'Utelly'].includes(provider)) {
+    return res.status(400).json({ error: 'Ungültiger Provider.' });
+  }
+
   try {
     let results = [];
     switch (provider) {
@@ -15,8 +27,6 @@ export const searchController = async (req: Request, res: Response) => {
       case 'Utelly':
         results = await searchUtelly(query, country);
         break;
-      default:
-        return res.status(400).json({ error: 'Ungültiger Provider' });
     }
     res.json({ results });
   } catch (error) {

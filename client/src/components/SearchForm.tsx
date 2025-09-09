@@ -6,13 +6,28 @@ type SearchFormProps = {
   onSearch: (params: { query: string; country: string; provider: string }) => void;
 };
 
+
 const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('DE');
   const [provider, setProvider] = useState('TMDb');
+  const [error, setError] = useState<string | null>(null);
+
+  const validate = () => {
+    if (!query.trim()) return 'Bitte gib einen Suchbegriff ein.';
+    if (!country.match(/^[A-Z]{2}$/)) return 'Ländercode muss genau 2 Großbuchstaben sein (z.B. DE, US).';
+    if (!provider) return 'Bitte wähle einen Provider.';
+    return null;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const err = validate();
+    if (err) {
+      setError(err);
+      return;
+    }
+    setError(null);
     onSearch({ query, country, provider });
   };
 
@@ -37,6 +52,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
       />
       <ProviderSelector value={provider} onChange={e => setProvider(e.target.value)} />
       <button className="button" type="submit">Suchen</button>
+      {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
     </form>
   );
 };
